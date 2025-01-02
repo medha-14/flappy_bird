@@ -13,12 +13,6 @@ class Background(pygame.sprite.Sprite):
         self.image = background_day
         self.rect = self.image.get_rect(topleft=(0, 0))
 
-class BaseBack(pygame.sprite.Sprite):
-    def __init__(self, groups):
-        super().__init__(groups)
-        self.image = base
-        self.rect = self.image.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT))
-
 class Bird(pygame.sprite.Sprite):
     def __init__(self, groups):
         super().__init__(groups)
@@ -29,15 +23,22 @@ class Bird(pygame.sprite.Sprite):
             pygame.image.load("images/bluebird-upflap.png").convert_alpha()
         ]
         
-        self.frames = [pygame.transform.scale_by(frame, 1.5) for frame in self.frames]
-        
-       
         self.index = 0
         self.counter = 0
         self.animation_speed = 10
         
         self.image = self.frames[self.index]
-        self.rect = self.image.get_frect(center=(WINDOW_WIDTH/2,WINDOW_HEIGHT/2))
+        self.rect = self.image.get_frect(center=(120,WINDOW_HEIGHT/2))
+
+        # Fly Timer
+        self.can_fly=True
+        self.last_fly_time=0
+        self.cooldown_time=1000
+
+    def Keytimer(self):
+        self.current_time = pygame.time.get_ticks()
+        if self.current_time - self.last_shoot_time >= self.cooldown_time:
+            self.can_shoot=True       
 
     def animate(self):
       
@@ -50,14 +51,32 @@ class Bird(pygame.sprite.Sprite):
 
     def update(self, dt):
         self.animate()
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] or keys[pygame.K_UP]:
+        keys = pygame.key.get_just_pressed()
+        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.can_fly():
             if self.rect.top > 0:
-                self.rect.y -= int(200 * dt)
+                self.rect.y -= int(250 * dt)
         else:
             if self.rect.bottom < (WINDOW_HEIGHT-BASE_HEIGHT):
                 self.rect.y += int(150 * dt)
 
+class Pipe(pygame.sprite.Sprite):
+    def __init__(self, surf, pos, groups):
+        super().__init__(groups)
+        self.image = surf
+        self.rect = self.image.get_rect(midtop=pos)
+        
+
+    def update(self, dt):
+        self.rect.x -= int(100 * dt)
+
+class UpPipe(pygame.sprite.Sprite):
+    def __init__(self, surf, pos, groups):
+        super().__init__(groups)
+        self.image = surf
+        self.rect = self.image.get_rect(midbottom=pos)
+
+    def update(self, dt):
+        self.rect.x -= int(100 * dt)
 
 # Initialize
 pygame.init()
@@ -75,12 +94,20 @@ background_night = pygame.transform.scale(background_night, (WINDOW_WIDTH, WINDO
 
 base = pygame.image.load("images/base.png").convert_alpha()
 base = pygame.transform.scale(base, (WINDOW_WIDTH, BASE_HEIGHT))
+base_rect = base.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT))
+
+pipe_down = pygame.image.load("images/pipe-green.png").convert_alpha()
+pipe_up= pygame.transform.rotate(pipe_down,180)
 
 # Sprites
 all_sprites = pygame.sprite.Group()
+pipe_sprites = pygame.sprite.Group()
 background = Background(all_sprites)
-base = BaseBack(all_sprites)
 bird = Bird(all_sprites)
+
+# Pipe event
+pipe_event = pygame.event.custom_type()
+pygame.time.set_timer(pipe_event,1250)  
 
 # Game loop
 while running:
@@ -90,13 +117,24 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pipe_event:
+            bottom_pipe_height = randint(280, 550)
+            Pipe(pipe_down, (WINDOW_WIDTH, bottom_pipe_height), [all_sprites, pipe_sprites])
+            
+            top_pipe_height = bottom_pipe_height - (randint(150,250))
+            UpPipe(pipe_up, (WINDOW_WIDTH, top_pipe_height), [all_sprites, pipe_sprites])
 
     # Update
     all_sprites.update(dt)
+    pipe_sprites.update(dt)
 
     # Draw
-    display_surface.fill((0, 0, 0))
-    all_sprites.draw(display_surface)
+    display_surface.fill((0, 0, 0)) 
+    all_sprites.draw(display_surface)  
+    pipe_sprites.draw(display_surface)
+    display_surface.blit(base,base_rect)
+    
+
     pygame.display.update()
 
 pygame.quit()
