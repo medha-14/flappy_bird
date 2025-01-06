@@ -2,7 +2,7 @@ import pygame
 from random import randint
 
 # Constants
-WINDOW_HEIGHT = 720
+WINDOW_HEIGHT = 600
 WINDOW_WIDTH = 480
 BASE_HEIGHT=120
 
@@ -29,6 +29,7 @@ class Bird(pygame.sprite.Sprite):
         
         self.image = self.frames[self.index]
         self.rect = self.image.get_frect(center=(120,WINDOW_HEIGHT/2))
+        self.mask = pygame.mask.from_surface(self.image)
 
         # Fly Timer
         self.can_fly=True
@@ -52,19 +53,20 @@ class Bird(pygame.sprite.Sprite):
     def update(self, dt):
         self.animate()
         keys = pygame.key.get_just_pressed()
-        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.can_fly():
+        if (keys[pygame.K_SPACE] or keys[pygame.K_UP]) and self.can_fly:
             if self.rect.top > 0:
-                self.rect.y -= int(250 * dt)
+                self.rect.y -= int(4000 * dt)
+                wing_sound.play()
         else:
             if self.rect.bottom < (WINDOW_HEIGHT-BASE_HEIGHT):
-                self.rect.y += int(150 * dt)
+                self.rect.y += int(150* dt)
 
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, surf, pos, groups):
         super().__init__(groups)
         self.image = surf
         self.rect = self.image.get_rect(midtop=pos)
-        
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, dt):
         self.rect.x -= int(100 * dt)
@@ -74,9 +76,18 @@ class UpPipe(pygame.sprite.Sprite):
         super().__init__(groups)
         self.image = surf
         self.rect = self.image.get_rect(midbottom=pos)
+        self.mask = pygame.mask.from_surface(self.image)
 
     def update(self, dt):
         self.rect.x -= int(100 * dt)
+
+def collisions():
+    global running
+    collided = pygame.sprite.spritecollide(bird, pipe_sprites, True, pygame.sprite.collide_mask)
+    if collided:
+        print("Collision detected!")
+        die_sound.play()
+        running = False
 
 # Initialize
 pygame.init()
@@ -99,6 +110,18 @@ base_rect = base.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT))
 pipe_down = pygame.image.load("images/pipe-green.png").convert_alpha()
 pipe_up= pygame.transform.rotate(pipe_down,180)
 
+die_sound=pygame.mixer.Sound("audio/die.ogg")
+die_sound.set_volume(0.3)
+hit_sound=pygame.mixer.Sound("audio/hit.ogg")
+hit_sound.set_volume(0.3)
+point_sound=pygame.mixer.Sound("audio/point.ogg")
+point_sound.set_volume(0.3)
+swoosh_sound=pygame.mixer.Sound("audio/swoosh.ogg")
+swoosh_sound.set_volume(0.3)
+wing_sound=pygame.mixer.Sound("audio/wing.ogg")
+wing_sound.set_volume(0.3)
+
+
 # Sprites
 all_sprites = pygame.sprite.Group()
 pipe_sprites = pygame.sprite.Group()
@@ -118,16 +141,17 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pipe_event:
-            bottom_pipe_height = randint(280, 550)
+            bottom_pipe_height = randint(200, 480)
             Pipe(pipe_down, (WINDOW_WIDTH, bottom_pipe_height), [all_sprites, pipe_sprites])
             
-            top_pipe_height = bottom_pipe_height - (randint(150,250))
+            top_pipe_height = bottom_pipe_height - (randint(125,175))
             UpPipe(pipe_up, (WINDOW_WIDTH, top_pipe_height), [all_sprites, pipe_sprites])
 
     # Update
     all_sprites.update(dt)
     pipe_sprites.update(dt)
-
+    collisions()
+    
     # Draw
     display_surface.fill((0, 0, 0)) 
     all_sprites.draw(display_surface)  
