@@ -16,3 +16,10 @@ class Bird(pygame.sprite.Sprite):
         self.velocity += self.gravity
         self.rect.y += self.velocity
         self.tick += 1
+
+    def jump(self):
+        self.velocity = self.lift
+
+    def animate(self):
+        self.index = (self.index + 1) % len(self.images)
+        self.image = self.images[self.index]
