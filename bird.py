@@ -12,3 +12,7 @@ class Bird(pygame.sprite.Sprite):
         self.lift = -10
         self.tick = 0
 
+    def update(self):
+        self.velocity += self.gravity
+        self.rect.y += self.velocity
+        self.tick += 1
