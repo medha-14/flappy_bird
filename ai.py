@@ -35,3 +35,16 @@ def eval_genomes(genomes, config):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+# Inside eval_genomes
+
+    while run and len(birds) > 0:
+        clock.tick(30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        for x, bird in enumerate(birds):
+            bird.move()  # Update bird's position
+            ge[x].fitness += 0.1  # Reward bird for surviving
