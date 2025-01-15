@@ -15,6 +15,29 @@ assets = load_assets()
 
 FLOOR = WIN.get_height() - 50  # Define the floor position
 
+def handle_collisions(birds, ge, nets, pipes):
+    rem = []
+    for pipe in pipes:
+        for x, bird in enumerate(birds):
+            if pipe.collide(bird):  # Check if bird hits pipe
+                ge[x].fitness -= 1
+                birds.pop(x)
+                nets.pop(x)
+                ge.pop(x)
+
+            if not pipe.passed and pipe.x < bird.x:
+                pipe.passed = True
+                return True  # Pipe passed by bird
+
+        if pipe.x + pipe.PIPE_TOP.get_width() < 0:
+            rem.append(pipe)
+    
+    # Remove passed pipes
+    for r in rem:
+        pipes.remove(r)
+
+    return False
+
 def eval_genomes(genomes, config):
     nets = []
     birds = []
