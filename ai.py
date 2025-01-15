@@ -13,10 +13,13 @@ pygame.display.set_caption("Flappy Bird AI")
 
 assets = load_assets()
 
+FLOOR = WIN.get_height() - 50  # Define the floor position
+
 def eval_genomes(genomes, config):
     nets = []
     birds = []
     ge = []
+    pipes = [Pipe(600)]  # Initialize the pipes list with one pipe
 
     # Initialize birds and networks for each genome
     for genome_id, genome in genomes:
@@ -28,23 +31,39 @@ def eval_genomes(genomes, config):
     
     clock = pygame.time.Clock()
     run = True
-
-    while run and len(birds) > 0:
-        clock.tick(30)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-# Inside eval_genomes
+    score = 0  # Initialize score
 
     while run and len(birds) > 0:
         clock.tick(30)
 
+        pipe_ind = 0
+        if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
+            pipe_ind = 1  # Target the next pipe
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
+        update_bird_fitness(birds, ge, nets, pipes, pipe_ind)
+
+        # Pipe handling logic
+        add_pipe = handle_collisions(birds, ge, nets, pipes)
+        
+        if add_pipe:
+            score += 1
+            for genome in ge:
+                genome.fitness += 5  # Reward for passing a pipe
+            pipes.append(Pipe(600))  # Add a new pipe
+
+        # Check for bird hitting the ground or top
         for x, bird in enumerate(birds):
-            bird.move()  # Update bird's position
-            ge[x].fitness += 0.1  # Reward bird for surviving
+            if bird.y + bird.img.get_height() >= FLOOR or bird.y < 0:  # Bird hits ground or top
+                ge[x].fitness -= 1
+                birds.pop(x)
+                nets.pop(x)
+                ge.pop(x)
+
+        draw_window(WIN, birds, pipes, score, assets)
+
+    pygame.quit()
