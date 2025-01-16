@@ -24,13 +24,27 @@ def draw_window(win, birds, pipes, score, assets):
     for bird in birds:
         bird.draw(win)  # Draw each bird
 
-    # Draw the score
+    # Draw the scoe
     font = pygame.font.SysFont("arial", 30)
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     win.blit(score_text, (10, 10))
 
     pygame.display.update()  # Update the screen
 
+def update_bird_fitness(birds, ge, nets, pipes, pipe_ind):
+    for x, bird in enumerate(birds):
+        bird.move()  # Move bird
+        ge[x].fitness += 0.1  # Reward for surviving
+
+        # Neural Network inputs:
+        output = nets[x].activate((
+            bird.y,  # Bird's y position
+            abs(bird.y - pipes[pipe_ind].height),  # Distance to next pipe
+            abs(bird.x - pipes[pipe_ind].x)  # Distance to pipe
+        ))
+
+        if output[0] > 0.5:  # If output > 0.5, bird jumps
+            bird.jump()
 
 def handle_collisions(birds, ge, nets, pipes):
     rem = []
