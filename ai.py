@@ -15,6 +15,23 @@ assets = load_assets()
 
 FLOOR = WIN.get_height() - 50  # Define the floor position
 
+def draw_window(win, birds, pipes, score, assets):
+    win.fill((0, 0, 0))  # Fill the background with black
+
+    for pipe in pipes:
+        pipe.draw(win)  # Draw each pipe
+
+    for bird in birds:
+        bird.draw(win)  # Draw each bird
+
+    # Draw the score
+    font = pygame.font.SysFont("arial", 30)
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+    win.blit(score_text, (10, 10))
+
+    pygame.display.update()  # Update the screen
+
+
 def handle_collisions(birds, ge, nets, pipes):
     rem = []
     for pipe in pipes:
