@@ -24,7 +24,7 @@ def draw_window(win, birds, pipes, score, assets):
     for bird in birds:
         bird.draw(win)  # Draw each bird
 
-    # Draw the scoe
+    # Draw the score
     font = pygame.font.SysFont("arial", 30)
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     win.blit(score_text, (10, 10))
