@@ -46,6 +46,13 @@ def process_birds(birds, ge, nets, pipes, pipe_ind):
         if output[0] > 0.5:
             bird.jump()    
 
+def remove_bird(i, birds, ge, nets):
+    ge[i].fitness -= 1
+    birds.pop(i)
+    ge.pop(i)
+    nets.pop(i)
+            
+
 def update_bird_fitness(birds, ge, nets, pipes, pipe_ind):
     for x, bird in enumerate(birds):
         bird.move()  # Move bird
