@@ -13,7 +13,7 @@ pygame.display.set_caption("Flappy Bird AI")
 
 assets = load_assets()
 
-FLOOR = WIN.get_height() - 50  # Define the floor position
+FLOOR = WIN.get_height() - 50
 
 def draw_window(win, birds, pipes, score, assets):
     win.fill((0, 0, 0))  # Fill the background with black
@@ -28,8 +28,23 @@ def draw_window(win, birds, pipes, score, assets):
     font = pygame.font.SysFont("arial", 30)
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     win.blit(score_text, (10, 10))
+    
 
     pygame.display.update()  # Update the screen
+    
+def process_birds(birds, ge, nets, pipes, pipe_ind):
+    for i, bird in enumerate(birds):
+        bird.move()
+        ge[i].fitness += 0.1
+
+        # Neural net decisions
+        output = nets[i].activate((
+            bird.y,
+            abs(bird.y - pipes[pipe_ind].height),
+            abs(bird.x - pipes[pipe_ind].x)
+        ))
+        if output[0] > 0.5:
+            bird.jump()    
 
 def update_bird_fitness(birds, ge, nets, pipes, pipe_ind):
     for x, bird in enumerate(birds):
