@@ -10,28 +10,22 @@ from flappy_ai.config import *
 pygame.init()
 WIN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Flappy Bird AI")
-
 assets = load_assets()
 
 FLOOR = WIN.get_height() - 50
 
 def draw_window(win, birds, pipes, score, assets):
-    win.fill((0, 0, 0))  # Fill the background with black
-
+    win.fill((0, 0, 0))  # Black background
     for pipe in pipes:
-        pipe.draw(win)  # Draw each pipe
-
+        pipe.draw(win)
     for bird in birds:
-        bird.draw(win)  # Draw each bird
+        bird.draw(win)
 
-    # Draw the score
     font = pygame.font.SysFont("arial", 30)
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
     win.blit(score_text, (10, 10))
-    
+    pygame.display.update()
 
-    pygame.display.update()  # Update the screen
-    
 def process_birds(birds, ge, nets, pipes, pipe_ind):
     for i, bird in enumerate(birds):
         bird.move()
@@ -44,101 +38,78 @@ def process_birds(birds, ge, nets, pipes, pipe_ind):
             abs(bird.x - pipes[pipe_ind].x)
         ))
         if output[0] > 0.5:
-            bird.jump()    
+            bird.jump()
 
 def remove_bird(i, birds, ge, nets):
     ge[i].fitness -= 1
     birds.pop(i)
     ge.pop(i)
     nets.pop(i)
-            
 
-def update_bird_fitness(birds, ge, nets, pipes, pipe_ind):
-    for x, bird in enumerate(birds):
-        bird.move()  # Move bird
-        ge[x].fitness += 0.1  # Reward for surviving
+def handle_pipe_collisions(pipes, birds, ge, nets):
+    score_incremented = False
+    to_remove = []
 
-        # Neural Network inputs:
-        output = nets[x].activate((
-            bird.y,  # Bird's y position
-            abs(bird.y - pipes[pipe_ind].height),  # Distance to next pipe
-            abs(bird.x - pipes[pipe_ind].x)  # Distance to pipe
-        ))
-
-        if output[0] > 0.5:  # If output > 0.5, bird jumps
-            bird.jump()
-
-def handle_collisions(birds, ge, nets, pipes):
-    rem = []
     for pipe in pipes:
-        for x, bird in enumerate(birds):
-            if pipe.collide(bird):  # Check if bird hits pipe
-                ge[x].fitness -= 1
-                birds.pop(x)
-                nets.pop(x)
-                ge.pop(x)
-
-            if not pipe.passed and pipe.x < bird.x:
+        for i, bird in enumerate(birds):
+            if pipe.collide(bird):
+                remove_bird(i, birds, ge, nets)
+            elif not pipe.passed and pipe.x < bird.x:
                 pipe.passed = True
-                return True  # Pipe passed by bird
+                score_incremented = True
 
         if pipe.x + pipe.PIPE_TOP.get_width() < 0:
-            rem.append(pipe)
-    
-    # Remove passed pipes
-    for r in rem:
-        pipes.remove(r)
+            to_remove.append(pipe)
 
-    return False
+    for pipe in to_remove:
+        pipes.remove(pipe)
+
+    return score_incremented
+
+def check_ground_collision(birds, ge, nets):
+    i = 0
+    while i < len(birds):
+        bird = birds[i]
+        if bird.y + bird.img.get_height() >= FLOOR or bird.y < 0:
+            remove_bird(i, birds, ge, nets)
+        else:
+            i += 1
 
 def eval_genomes(genomes, config):
-    nets = []
-    birds = []
-    ge = []
-    pipes = [Pipe(600)]  # Initialize the pipes list with one pipe
+    nets, ge, birds = [], [], []
+    pipes = [Pipe(600)]
+    score, run = 0, True
 
-    # Initialize birds and networks for each genome
-    for genome_id, genome in genomes:
+    for _, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        birds.append(Bird(230, 350))  # Starting position
+        birds.append(Bird(230, 350))
         genome.fitness = 0
         ge.append(genome)
-    
+
     clock = pygame.time.Clock()
-    run = True
-    score = 0  # Initialize score
 
-    while run and len(birds) > 0:
+    while run and birds:
         clock.tick(30)
-
-        pipe_ind = 0
-        if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
-            pipe_ind = 1  # Target the next pipe
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-        update_bird_fitness(birds, ge, nets, pipes, pipe_ind)
+        pipe_ind = 0
+        if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
+            pipe_ind = 1
 
-        # Pipe handling logic
-        add_pipe = handle_collisions(birds, ge, nets, pipes)
-        
-        if add_pipe:
+        process_birds(birds, ge, nets, pipes, pipe_ind)
+
+        if handle_pipe_collisions(pipes, birds, ge, nets):
             score += 1
             for genome in ge:
-                genome.fitness += 5  # Reward for passing a pipe
-            pipes.append(Pipe(600))  # Add a new pipe
+                genome.fitness += 5
+            pipes.append(Pipe(600))
 
-        # Check for bird hitting the ground or top
-        for x, bird in enumerate(birds):
-            if bird.y + bird.img.get_height() >= FLOOR or bird.y < 0:  # Bird hits ground or top
-                ge[x].fitness -= 1
-                birds.pop(x)
-                nets.pop(x)
-                ge.pop(x)
+        check_ground_collision(birds, ge, nets)
 
         draw_window(WIN, birds, pipes, score, assets)
 
