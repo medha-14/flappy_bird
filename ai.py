@@ -67,13 +67,10 @@ def handle_pipe_collisions(pipes, birds, ge, nets):
     return score_incremented
 
 def check_ground_collision(birds, ge, nets):
-    i = 0
-    while i < len(birds):
+    for i in range(len(birds)):
         bird = birds[i]
         if bird.y + bird.img.get_height() >= FLOOR or bird.y < 0:
             remove_bird(i, birds, ge, nets)
-        else:
-            i += 1
 
 def eval_genomes(genomes, config):
     nets, ge, birds = [], [], []
