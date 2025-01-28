@@ -41,6 +41,7 @@ def process_birds(birds, ge, nets, pipes, pipe_ind):
             bird.jump()
 
 def remove_bird(i, birds, ge, nets):
+    print(f"Removing bird {i}")
     ge[i].fitness -= 1
     birds.pop(i)
     ge.pop(i)
