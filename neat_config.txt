@@ -66,3 +66,8 @@ species_elitism      = 2
 [DefaultReproduction]
 elitism            = 2
 survival_threshold = 0.2
+
+pygame
+neat-python
+matplotlib
+
