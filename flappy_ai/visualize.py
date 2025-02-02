@@ -7,3 +7,10 @@ def plot_fitness(statistics, ylog=False, view=False, filename="fitness.svg"):
     avg_fitness = np.array(statistics.get_fitness_mean())
     stdev_fitness = np.array(statistics.get_fitness_stdev())
 
+    plt.figure()
+    plt.plot(generation, avg_fitness, "b-", label="average")
+    plt.plot(generation, avg_fitness - stdev_fitness, "g--", label="-1 sd")
+    plt.plot(generation, avg_fitness + stdev_fitness, "g--", label="+1 sd")
+    plt.plot(generation, best_fitness, "r-", label="best")
+
+ 
