@@ -18,6 +18,9 @@ def plot_fitness(statistics, ylog=False, view=False, filename="fitness.svg"):
     plt.ylabel("Fitness")
     plt.grid()
     plt.legend(loc="best")
+    if ylog:
+        plt.yscale('symlog')
+    plt.savefig(filename)
     if view:
         plt.show()
     plt.close()
