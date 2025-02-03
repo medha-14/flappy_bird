@@ -13,4 +13,11 @@ def plot_fitness(statistics, ylog=False, view=False, filename="fitness.svg"):
     plt.plot(generation, avg_fitness + stdev_fitness, "g--", label="+1 sd")
     plt.plot(generation, best_fitness, "r-", label="best")
 
- 
+    plt.title("Population's Average and Best Fitness")
+    plt.xlabel("Generations")
+    plt.ylabel("Fitness")
+    plt.grid()
+    plt.legend(loc="best")
+    if view:
+        plt.show()
+    plt.close()
