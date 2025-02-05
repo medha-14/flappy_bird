@@ -50,11 +50,10 @@ while running:
         if pipe.rect.right < 0:
             pipes.remove(pipe)
 
-    # Drawing to the screen
-    screen.blit(assets["background"], (0, 0))  # Draw background
+    screen.blit(assets["background"], (0, 0))
     pipes.draw(screen)  # Draw pipes
-    screen.blit(base.image, base.rect)  # Draw base
-    screen.blit(bird.image, bird.rect)  # Draw bird
+    screen.blit(base.image, base.rect)
+    screen.blit(bird.image, bird.rect) 
 
     # Update display
     pygame.display.update()
