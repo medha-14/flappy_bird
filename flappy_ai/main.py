@@ -12,6 +12,7 @@ pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 
 assets = load_assets()
+score = 0
 
 bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
@@ -28,6 +29,11 @@ while running:
 
     bird.update()
     base.update(4)
+    score_str = str(score)
+    x_pos = 10
+    for digit in score_str:
+        screen.blit(assets["digits"][digit], (x_pos, 10))
+        x_pos += assets["digits"][digit].get_width() 
 
     if len(pipes) == 0 or pipes.sprites()[-1].rect.x < WINDOW_WIDTH - PIPE_DISTANCE:
         pipes.add(Pipe(WINDOW_WIDTH))
