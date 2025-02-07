@@ -12,16 +12,15 @@ pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 
 assets = load_assets()
-score = 0
 
 bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
 pipes = pygame.sprite.Group()
 
+score = 0  # Initialize the score
 running = True
 while running:
- 
-    dt = clock.tick(60) / 1000
+    dt = clock.tick(60) / 1000  # Limit to 60 FPS
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -29,29 +28,24 @@ while running:
 
     bird.update()
     base.update(4)
-    score_str = str(score)
-    x_pos = 10
-    for digit in score_str:
-        screen.blit(assets["digits"][digit], (x_pos, 10))
-        x_pos += assets["digits"][digit].get_width() 
 
+    # Update the score display
+    score_str = str(score)
+    x_pos = 10  # Starting position for drawing the score
+    for digit in score_str:
+        screen.blit(assets["digits"][digit], (x_pos, 10))  # Blit each digit image
+        x_pos += assets["digits"][digit].get_width()  # Move x_pos to the next digit's position
+
+    # Pipe logic: add a new pipe if the last pipe is far enough
     if len(pipes) == 0 or pipes.sprites()[-1].rect.x < WINDOW_WIDTH - PIPE_DISTANCE:
         pipes.add(Pipe(WINDOW_WIDTH))
 
+    # Update all pipes
     pipes.update()
 
-
-    for pipe in pipes:
-        if pipe.rect.right < 0:
-            pipes.remove(pipe)
-
-    screen.blit(assets["background"], (0, 0))
-    pipes.draw(screen)
-    screen.blit(base.image, base.rect)
-    screen.blit(bird.image, bird.rect) 
-
-
-    pygame.display.update()
-
+    # Remove pipes that have moved off-screen
+   
+    # Update the screen
+    pygame.display.update()  # Update the screen
 
 pygame.quit()
