@@ -47,6 +47,12 @@ while running:
     for pipe in pipes:
         if pipe.rect.right < 0:
             pipes.remove(pipe)
+   # Draw everything to the screen
+    screen.blit(assets["background"], (0, 0))  # Background
+    pipes.draw(screen)  # Draw pipes
+    screen.blit(base.image, base.rect)  # Draw base
+    screen.blit(bird.image, bird.rect)  # Draw bird
+ 
 
    
     # Update the screen
