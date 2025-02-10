@@ -44,6 +44,10 @@ while running:
     pipes.update()
 
     # Remove pipes that have moved off-screen
+    for pipe in pipes:
+        if pipe.rect.right < 0:
+            pipes.remove(pipe)
+
    
     # Update the screen
     pygame.display.update()  # Update the screen
