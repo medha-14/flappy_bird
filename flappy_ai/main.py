@@ -19,6 +19,16 @@ pipes = pygame.sprite.Group()
 
 score = 0  # Initialize the score
 running = True
+
+def game_over():
+    screen.blit(assets["game_over"], (
+        (WINDOW_WIDTH - assets["game_over"].get_width()) // 2,
+        WINDOW_HEIGHT // 3
+    ))
+    pygame.display.update()
+    pygame.time.wait(2000)
+    
+    
 while running:
     dt = clock.tick(60) / 1000  # Limit to 60 FPS
 
