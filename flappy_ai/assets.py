@@ -14,11 +14,16 @@ def load_assets():
     digit_images = {}
     for i in range(10):
         digit_images[str(i)] = pygame.image.load(f"images/{i}.png").convert_alpha()
+        
+    game_over_img = pygame.image.load("images/gameover.png").convert_alpha()
+  
+    
 
     return {
         "bird": bird_images,
         "background": background,
         "base": base_img,
         "pipe": pipe_img,
-        "digits": digit_images  # Adding digit images to the dictionary
+        "digits": digit_images,
+        "game_over": game_over_img
     }
