@@ -17,7 +17,7 @@ bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
 pipes = pygame.sprite.Group()
 
-score = 0
+score = 0  
 running = True
 
 def game_over():
@@ -65,7 +65,7 @@ while running:
     screen.blit(bird.image, bird.rect)
 
     score_str = str(score)
-    x_pos = 10
+    x_pos = 120
     for digit in score_str:
         screen.blit(assets["digits"][digit], (x_pos, 10))
         x_pos += assets["digits"][digit].get_width()
