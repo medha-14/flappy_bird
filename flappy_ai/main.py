@@ -64,7 +64,12 @@ while running:
     screen.blit(base.image, base.rect)
     screen.blit(bird.image, bird.rect)
 
-  
+    score_str = str(score)
+    x_pos = 10
+    for digit in score_str:
+        screen.blit(assets["digits"][digit], (x_pos, 10))
+        x_pos += assets["digits"][digit].get_width()
+
     pygame.display.update()
 
 pygame.quit()
