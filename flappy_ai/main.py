@@ -1,3 +1,4 @@
+
 import pygame
 from flappy_ai.assets import load_assets
 from flappy_ai.bird import Bird
@@ -17,17 +18,9 @@ bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
 pipes = pygame.sprite.Group()
 
-score = 0  
+pipe_speed = 4
+score = 0
 running = True
-
-def game_over():
-    screen.blit(assets["game_over"], (
-        (WINDOW_WIDTH - assets["game_over"].get_width()) // 2,
-        WINDOW_HEIGHT // 3
-    ))
-    pygame.display.update()
-    pygame.time.wait(2000)
-
 while running:
     dt = clock.tick(60) / 1000
 
@@ -36,13 +29,10 @@ while running:
             running = False
 
     bird.update()
-    base.update(4)
+    base.update(pipe_speed)
 
     if len(pipes) == 0 or pipes.sprites()[-1].rect.x < WINDOW_WIDTH - PIPE_DISTANCE:
         pipes.add(Pipe(WINDOW_WIDTH))
-
-    pipes.update()
-
     for pipe in pipes:
         if pipe.rect.right < 0:
             pipes.remove(pipe)
