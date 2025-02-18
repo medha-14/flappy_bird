@@ -41,13 +41,24 @@ while running:
             game_over()
             running = False
 
+    bird.update()
+    base.update(pipe_speed)
+
+    if len(pipes) == 0 or pipes.sprites()[-1].rect.x < WINDOW_WIDTH - PIPE_DISTANCE:
+        pipes.add(Pipe(WINDOW_WIDTH))
+
+    for pipe in pipes:
+        pipe.rect.x -= pipe_speed
+        pipe.top_rect.x -= pipe_speed
+
         if not pipe.passed and pipe.rect.right < bird.rect.left:
             pipe.passed = True
             score += 1
+            if score % 10 == 0:
+                pipe_speed += 1
 
-    if bird.rect.bottom >= WINDOW_HEIGHT or bird.rect.top <= 0:
-        game_over()
-        running = False
+        if pipe.rect.right < 0:
+            pipes.remove(pipe)
 
     screen.blit(assets["background"], (0, 0))
     pipes.draw(screen)
