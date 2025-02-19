@@ -20,6 +20,7 @@ pipes = pygame.sprite.Group()
 
 pipe_speed = 4
 score = 0
+
 running = True
 while running:
     dt = clock.tick(60) / 1000
@@ -34,6 +35,15 @@ while running:
     if len(pipes) == 0 or pipes.sprites()[-1].rect.x < WINDOW_WIDTH - PIPE_DISTANCE:
         pipes.add(Pipe(WINDOW_WIDTH))
     for pipe in pipes:
+        pipe.rect.x -= pipe_speed
+        pipe.top_rect.x -= pipe_speed
+
+        if not pipe.passed and pipe.rect.right < bird.rect.left:
+            pipe.passed = True
+            score += 1
+            if score % 10 == 0:
+                pipe_speed += 1
+
         if pipe.rect.right < 0:
             pipes.remove(pipe)
 
