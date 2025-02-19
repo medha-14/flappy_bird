@@ -37,8 +37,27 @@ while running:
         if pipe.rect.right < 0:
             pipes.remove(pipe)
 
-        if pipe.rect.colliderect(bird.rect) or pipe.top_rect.colliderect(bird.rect):
-            game_over()
+    screen.blit(assets["background"], (0, 0))
+    pipes.draw(screen)
+    screen.blit(base.image, base.rect)
+    screen.blit(bird.image, bird.rect)
+
+    score_str = str(score)
+    x_pos = 10
+    for digit in score_str:
+        screen.blit(assets["digits"][digit], (x_pos, 10))
+        x_pos += assets["digits"][digit].get_width()
+
+    pygame.display.update()
+
+pygame.quit()
+
+running = True
+while running:
+    dt = clock.tick(60) / 1000
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
             running = False
 
     bird.update()
