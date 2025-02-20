@@ -38,7 +38,7 @@ while running:
         pipe.rect.x -= pipe_speed
         pipe.top_rect.x -= pipe_speed
 
-        if not pipe.passed and pipe.rect.left < bird.rect.left:
+        if not pipe.passed and pipe.rect.right < bird.rect.left:
             pipe.passed = True
             score += 1
             if score % 10 == 0:
