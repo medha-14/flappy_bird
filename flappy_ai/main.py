@@ -38,11 +38,6 @@ while running:
         pipe.rect.x -= pipe_speed
         pipe.top_rect.x -= pipe_speed
 
-        if not pipe.passed and pipe.rect.right < bird.rect.left:
-            pipe.passed = True
-            score += 1
-            if score % 10 == 0:
-                pipe_speed += 1
 
         if pipe.rect.right < 0:
             pipes.remove(pipe)
