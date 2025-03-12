@@ -1,4 +1,3 @@
-
 import pygame
 from flappy_ai.assets import load_assets
 from flappy_ai.bird import Bird
@@ -14,6 +13,10 @@ clock = pygame.time.Clock()
 
 assets = load_assets()
 
+point_sound = pygame.mixer.Sound("audio/point.ogg")
+hit_sound = pygame.mixer.Sound("audio/hit.ogg")
+wing_sound = pygame.mixer.Sound("audio/wing.ogg")
+
 bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
 pipes = pygame.sprite.Group()
@@ -28,12 +31,17 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                wing_sound.play()
+                bird.jump()
 
     bird.update()
     base.update(pipe_speed)
 
     if len(pipes) == 0 or pipes.sprites()[-1].rect.x < WINDOW_WIDTH - PIPE_DISTANCE:
         pipes.add(Pipe(WINDOW_WIDTH))
+
     for pipe in pipes:
         pipe.rect.x -= pipe_speed
         pipe.top_rect.x -= pipe_speed
@@ -41,11 +49,21 @@ while running:
         if not pipe.passed and pipe.rect.right < bird.rect.left:
             pipe.passed = True
             score += 1
+            point_sound.play()
             if score % 10 == 0:
                 pipe_speed += 1
 
         if pipe.rect.right < 0:
             pipes.remove(pipe)
+
+    for pipe in pipes:
+        if bird.rect.colliderect(pipe.top_rect) or bird.rect.colliderect(pipe.bottom_rect):
+            hit_sound.play()
+            running = False
+
+    if bird.rect.bottom >= WINDOW_HEIGHT - BASE_HEIGHT:
+        hit_sound.play()
+        running = False
 
     screen.blit(assets["background"], (0, 0))
     pipes.draw(screen)
