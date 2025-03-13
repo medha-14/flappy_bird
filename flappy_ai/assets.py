@@ -16,7 +16,11 @@ def load_assets():
         digit_images[str(i)] = pygame.image.load(f"images/{i}.png").convert_alpha()
         
     game_over_img = pygame.image.load("images/gameover.png").convert_alpha()
-  
+    
+    
+    point_sound = pygame.mixer.Sound("audio/point.ogg")
+    hit_sound = pygame.mixer.Sound("audio/hit.ogg")
+    wing_sound = pygame.mixer.Sound("audio/wing.ogg")
     
 
     return {
@@ -25,5 +29,10 @@ def load_assets():
         "base": base_img,
         "pipe": pipe_img,
         "digits": digit_images,
-        "game_over": game_over_img
+        "game_over": game_over_img,
+        "sounds": {
+            "point": point_sound,
+            "hit": hit_sound,
+            "wing": wing_sound
+        }
     }

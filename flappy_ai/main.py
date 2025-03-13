@@ -12,11 +12,6 @@ pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 
 assets = load_assets()
-
-point_sound = pygame.mixer.Sound("audio/point.ogg")
-hit_sound = pygame.mixer.Sound("audio/hit.ogg")
-wing_sound = pygame.mixer.Sound("audio/wing.ogg")
-
 bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
 pipes = pygame.sprite.Group()
