@@ -16,6 +16,10 @@ bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
 pipes = pygame.sprite.Group()
 
+point_sound = assets["sounds"]["point"]
+hit_sound = assets["sounds"]["hit"]
+wing_sound = assets["sounds"]["wing"]
+
 pipe_speed = 4
 score = 0
 
