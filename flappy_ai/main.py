@@ -7,22 +7,29 @@ from flappy_ai.config import *
 
 pygame.init()
 
+# Initialize screen and clock
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 
+# Load assets
 assets = load_assets()
+
+# Initialize game elements
 bird = Bird(100, WINDOW_HEIGHT // 2, assets["bird"])
 base = Base(assets["base"], WINDOW_HEIGHT - BASE_HEIGHT)
 pipes = pygame.sprite.Group()
 
+# Sound effects
 point_sound = assets["sounds"]["point"]
 hit_sound = assets["sounds"]["hit"]
 wing_sound = assets["sounds"]["wing"]
 
+# Game variables
 pipe_speed = 4
 score = 0
 
+# Main game loop
 running = True
 while running:
     dt = clock.tick(60) / 1000
@@ -30,10 +37,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                wing_sound.play()
-                bird.jump()
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            wing_sound.play()
+            bird.jump()
 
     bird.update()
     base.update(pipe_speed)
@@ -65,7 +71,7 @@ while running:
         running = False
 
     screen.blit(assets["background"], (0, 0))
-    pipes.draw(screen)
+    pipes.draw(screen) 
     screen.blit(base.image, base.rect)
     screen.blit(bird.image, bird.rect)
 
@@ -78,4 +84,3 @@ while running:
     pygame.display.update()
 
 pygame.quit()
-
