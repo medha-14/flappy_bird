@@ -1,0 +1,13 @@
+# Trained models (large .zip files)
+models/
+
+# Training results (metrics JSON + plots)
+results/
+three_models/
+three_results/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
