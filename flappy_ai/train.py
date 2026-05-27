@@ -23,15 +23,14 @@ from pathlib import Path
 
 import numpy as np
 import matplotlib
-matplotlib.use("Agg")          # non-interactive backend – no display required
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from stable_baselines3 import DQN
 from stable_baselines3.common.callbacks import BaseCallback
 
 from flappy_ai.env import FlappyEnv
 
-# ── paths ────────────────────────────────────────────────────────────────────
-ROOT = Path(__file__).resolve().parent.parent  # flappy_bird/
+ROOT = Path(__file__).resolve().parent.parent
 MODEL_DIR = ROOT / "models"
 RESULTS_DIR = ROOT / "results"
 
@@ -41,7 +40,6 @@ RESULTS_DIR.mkdir(exist_ok=True)
 POLICIES = ["sparse", "dense", "penalty", "distance", "hybrid"]
 
 
-# ── callback to log episode rewards ─────────────────────────────────────────
 
 class RewardLogger(BaseCallback):
     """Records episode rewards and lengths for plotting later."""
@@ -55,18 +53,15 @@ class RewardLogger(BaseCallback):
         self._current_length = 0
 
     def _on_step(self) -> bool:
-        # SB3 vectorised envs expose info dicts in self.locals["infos"]
         infos = self.locals.get("infos", [])
         for info in infos:
             if "episode" in info:
                 self.episode_rewards.append(info["episode"]["r"])
                 self.episode_lengths.append(info["episode"]["l"])
-                # Our custom "score" is passed through info
                 self.episode_scores.append(info.get("score", 0))
         return True
 
 
-# ── training routine ─────────────────────────────────────────────────────────
 
 def train_single(
     policy: str,
@@ -81,7 +76,6 @@ def train_single(
     print(f"{'='*60}\n")
 
     env = FlappyEnv(reward_policy=policy, render_mode=None)
-    # Wrap with Monitor for episode stats
     from stable_baselines3.common.monitor import Monitor
     env = Monitor(env)
 
@@ -105,16 +99,13 @@ def train_single(
     model.learn(total_timesteps=total_timesteps, callback=logger)
     elapsed = time.time() - t0
 
-    # Save model
     model_path = MODEL_DIR / f"dqn_{policy}_seed{seed}"
     model.save(str(model_path))
     print(f"Model saved → {model_path}")
 
-    # Compute summary metrics
     rewards = np.array(logger.episode_rewards)
     scores = np.array(logger.episode_scores)
 
-    # Moving average (window = 50)
     window = min(50, len(rewards))
     if window > 0:
         ma = np.convolve(rewards, np.ones(window) / window, mode="valid")
@@ -137,7 +128,6 @@ def train_single(
         "moving_avg_reward": ma.tolist(),
     }
 
-    # Save raw metrics as JSON
     json_path = RESULTS_DIR / f"metrics_{policy}_seed{seed}.json"
     with open(json_path, "w") as f:
         json.dump(metrics, f, indent=2)
@@ -147,7 +137,6 @@ def train_single(
     return metrics
 
 
-# ── plotting ─────────────────────────────────────────────────────────────────
 
 def plot_single(metrics: dict, out_dir: Path):
     """Save learning-curve plot for one run."""
@@ -191,7 +180,6 @@ def plot_comparison(all_metrics: dict[str, list[dict]], out_dir: Path):
     }
 
     for policy, runs in all_metrics.items():
-        # Average the moving-avg curves across seeds
         min_len = min(len(r["moving_avg_reward"]) for r in runs)
         if min_len == 0:
             continue
@@ -244,7 +232,6 @@ def plot_score_bar(all_metrics: dict[str, list[dict]], out_dir: Path):
     print(f"Score bar chart saved → {path}")
 
 
-# ── CLI ──────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(description="Train DQN on Flappy Bird")
@@ -268,7 +255,6 @@ def main():
                 plot_single(m, RESULTS_DIR)
                 all_metrics[policy].append(m)
 
-        # Generate comparison plots
         plot_comparison(all_metrics, RESULTS_DIR)
         plot_score_bar(all_metrics, RESULTS_DIR)
         print(f"\n✅  All training complete.  Results in {RESULTS_DIR}/")

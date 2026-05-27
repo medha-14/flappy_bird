@@ -29,7 +29,7 @@ POLICIES = ["sparse", "dense", "penalty", "distance", "hybrid"]
 def enjoy(policy: str = "hybrid", seed: int = 0, episodes: int = 5):
     model_path = MODEL_DIR / f"dqn_{policy}_seed{seed}"
     if not model_path.with_suffix(".zip").exists():
-        print(f"❌  Model not found: {model_path}.zip")
+        print(f"    Model not found: {model_path}.zip")
         print(f"    Train it first:  python -m flappy_ai.train --policy {policy} --seed {seed}")
         return
 
